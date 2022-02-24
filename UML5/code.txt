@@ -1,0 +1,190 @@
+@startuml
+Class palos{
+-log :Log
+- cmdLine :CommandLine
++ {static} main() :void
+- runCommandLine() : void
+- showLicense() : void
+- checkUpdate() : void
+}
+
+class Constant{
+- {static} staticSP:boolean
+- {static} instance:Constant
+- {static} staticEyeCatcher:String
++ {static} getInstance() :Constant
++ {static} isWindows() :boolean
++ {static} isLinux() :boolean
+}
+
+class Model{
+- session:Session
++ {static} getSingleton() :Model
++ {static} getDb() :Database
++ {static} getSession() :Session
++ {static} setSession() :void
+}
+
+class Control{
+- {static} log: Log
+- {static} control: Control
++ {static} initSingletonWithoutView() :void
++ {static} getProxy() :Proxy
++ runCommandLineNewSession() :void
+#  addExtension() :void
+}
+
+Class View{
+- mainFrame : MainFrame
+- sessionDialog: SessionDialog
+- optionsDialog: OptionsDialog
++  postInit() :void
++  postInit() :void
++  getMainFrame() :MainFrame
+}
+
+Class Session{
++  setSessionDesc() :void
++  setSessionId() :void
+-  saveSiteTree() :void
+}
+
+Class OptionsParam{
++  addParamSet() :void
++  getParamSet() :AbstractParam
+#  parse() :void
+}
+
+Class Database{
++  {static} getSingleton() :Database
+-  {static} setTableSession() :void
+-  {static} setDatabaseServer() :void
+-  {static} database :Database
+-   databaseServer:DatabaseServer
+-   tableSession:TableSession
+}
+
+Class ViewDelegate{
++  getMainFrame() :MainFrame
++  getSiteTreePanel() :SiteMapPanel
++  OutputPanel() :getOutputPanel
+}
+
+Class MenuFileControl{
+-  view :View
+-  model:Model
+-  control:Control
++  exit() :void
++  openSession() :void
++ newSession(boolean) :void
+}
+
+Class MenuToolsControl{
+-  view :View
+-  model:Model
+-  control:Control
++  options() :void
+}
+
+Class Proxy{
+-  model:Model
+-  proxyServer:ProxyServer
++  cacheProcessingList() :Vector
++  stopServer() :void
++  setSerialize(boolean) :void
++  addProxyListener() :ProxyListener 
+}
+
+Class ProxyServer{
+#  proxySocket:ServerSocket
+#  proxyParam:ProxyParam
+#  connectionParam:ConnectionParam
++  run() :void
++  setProxyParam() :void
+#  createProxyProcess() :ProxyThread
+}
+
+Class ProxyServerSSL{
+- {static} ssl:SSLConnector
+# createServerSocket(String,int) : ServerSocket
+# createProxyProcess(Socket) : ProxyThread
+}
+
+Class ProxyParam{
+- proxyIp : String
+- proxyPort: int
+- proxySSLPort: int
+# parse() : void
++ getProxyIp() : String
++ setProxyIp(String) : void
+}
+
+Class ProxyThread{
+# parentServer : ProxyServer
+# proxyParam : ProxyParam
+# connectionParam : ConnectionParam
++ run() : void
+- isConnectionClose(HttpMessage) : boolean
+# disconnect() : void
+}
+
+Class HttpUtil{
++ {static} encodeURI(String) : String
++ {static} sleep(int) : void
++ {static} closeServerSocket(ServerSocket) : void
+}
+
+Class FileXML{
+# doc : Document
+# docBuilder : DocumentBuilder
+# docBuilderFactory: DocumentBuilderFactory
++ FileXML(int) : void
+# getElement() : Element
++ setDocument(Document) : void
+}
+
+Class AbstractParam{
+- config  : FileConfiguration
++  getConfig() : FileConfiguration
++ load(ServerSocket) : void
+}
+
+Class AbstractControl{
+# loader: ExtensionLoader
+# model: Model
+# view: View
+# loadExtension(): void
+# shutdown(): void
++  getExtensionLoader() : ExtensionLoader
+}
+palos ..> Model
+palos ..> Constant
+palos ..> View
+palos ..> Control
+
+Model ..> Database
+Model --* OptionsParam
+Model --* Session
+Model --o AbstractControl
+Model --o Proxy
+
+Control--> AbstractControl
+Control o-- Proxy
+Control o-- MenuFileControl
+Control o-- MenuToolsControl
+
+OptionsParam --> AbstractParam
+Session --> FileXML
+
+View ..> ViewDelegate
+View --o AbstractControl
+
+ProxyServer ..* Proxy
+ProxyServer *-- ProxyParam
+ProxyServer ..> ProxyThread
+ProxyServer --> ProxyServerSSL
+
+ProxyServerSSL ..* Proxy
+
+ProxyThread..> HttpUtil
+@enduml
